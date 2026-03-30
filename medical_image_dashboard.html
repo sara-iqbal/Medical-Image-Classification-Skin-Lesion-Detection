@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><title>Medical Image Classification — Sara Iqbal</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#faf9f7;--white:#fff;--warm1:#f5f3ef;--border:#e2ddd6;--ink:#1c1a17;--navy:#12234a;--gold:#9a6b00;--gold2:#c4a030;--teal:#0c5f5a;--green:#145232;--red:#8b2020;--amber:#7a4a0a;--muted:#6b6459;--light:#a09890;--display:"Cormorant Garamond",serif;--body:"Outfit",sans-serif;--mono:"JetBrains Mono",monospace;--sh:0 1px 3px rgba(28,26,23,.06),0 4px 16px rgba(28,26,23,.04);}
+*{margin:0;padding:0;box-sizing:border-box;}body{background:var(--cream);color:var(--ink);font-family:var(--body);font-size:14px;}
+header{background:var(--navy);position:relative;overflow:hidden;}
+header::after{content:"";position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold2),var(--gold));}
+.hgrid{position:absolute;inset:0;opacity:.03;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,#fff 39px,#fff 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,#fff 39px,#fff 40px);}
+.hinner{max-width:1340px;margin:0 auto;padding:36px 44px 32px;display:grid;grid-template-columns:1fr auto;gap:32px;align-items:center;position:relative;z-index:1;}
+.eyebrow{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.4);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+.eyebrow::before{content:"";width:24px;height:1px;background:var(--gold);}
+h1{font-family:var(--display);font-size:clamp(22px,2.8vw,34px);font-weight:600;color:#fff;line-height:1.15;margin-bottom:6px;}
+.hsub{font-size:12.5px;color:rgba(255,255,255,.45);line-height:1.9;}
+.hstats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;border:1px solid rgba(255,255,255,.1);border-radius:9px;overflow:hidden;background:rgba(255,255,255,.08);min-width:280px;}
+.hs{background:rgba(255,255,255,.03);padding:16px 18px;text-align:center;}
+.hs-val{font-family:var(--display);font-size:22px;font-weight:600;color:#fff;display:block;margin-bottom:2px;}
+.hs-lbl{font-family:var(--mono);font-size:8px;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;}
+nav{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.nav-inner{max-width:1340px;margin:0 auto;padding:0 44px;display:flex;}
+.ntab{font-size:12px;font-weight:500;color:var(--muted);padding:14px 20px;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.ntab:hover{color:var(--ink);}.ntab.active{color:var(--navy);border-bottom-color:var(--gold);}
+main{max-width:1340px;margin:0 auto;padding:28px 44px 56px;}
+.sec{display:none;}.sec.active{display:block;}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-bottom:22px;}
+.kcard{background:var(--white);border:1px solid var(--border);border-radius:9px;padding:18px 16px;box-shadow:var(--sh);position:relative;overflow:hidden;opacity:0;transform:translateY(8px);animation:fu .4s forwards;}
+.kcard::before{content:"";position:absolute;top:0;left:0;right:0;height:2.5px;}
+.kcard.gld::before{background:linear-gradient(90deg,var(--gold),var(--gold2));}.kcard.nvy::before{background:var(--navy);}.kcard.tel::before{background:var(--teal);}.kcard.grn::before{background:var(--green);}.kcard.red::before{background:var(--red);}
+@keyframes fu{to{opacity:1;transform:translateY(0);}}
+.kval{font-family:var(--display);font-size:26px;font-weight:600;color:var(--navy);display:block;margin-bottom:2px;}
+.klbl{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;}
+.ksub{font-size:11px;color:var(--light);margin-top:4px;display:block;}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+.panel{background:var(--white);border:1px solid var(--border);border-radius:9px;padding:20px;box-shadow:var(--sh);opacity:0;animation:fu .45s forwards;}
+.pfull{grid-column:1/-1;}
+.phead{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.ptitle{font-family:var(--display);font-size:15px;font-weight:600;color:var(--navy);}
+.psub{font-family:var(--mono);font-size:8.5px;color:var(--muted);margin-top:2px;}
+.chip{font-family:var(--mono);font-size:8px;padding:3px 9px;border-radius:20px;border:1px solid;text-transform:uppercase;letter-spacing:.8px;}
+.chip-nvy{color:var(--navy);border-color:rgba(18,35,74,.2);background:rgba(18,35,74,.04);}
+.chip-gld{color:var(--gold);border-color:rgba(154,107,0,.3);background:rgba(154,107,0,.06);}
+canvas{max-height:260px;}
+.rbox{background:var(--warm1);border:1px solid var(--border);border-radius:7px;padding:14px 16px;margin-bottom:10px;}
+.rbox-title{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+.rbox-val{font-family:var(--display);font-size:18px;font-weight:600;color:var(--navy);}
+.rbox-sub{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.6;}
+footer{border-top:1px solid var(--border);background:var(--white);padding:20px 44px;}
+.fin{max-width:1340px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.fl{font-size:12.5px;color:var(--muted);line-height:1.7;}.fl strong{color:var(--navy);}
+.flinks{display:flex;gap:18px;}.flinks a{font-family:var(--mono);font-size:9.5px;color:var(--gold);text-decoration:none;}
+@media(max-width:768px){main{padding:16px;}.pgrid{grid-template-columns:1fr;}.hinner{grid-template-columns:1fr;}}
+</style></head><body>
+<header><div class="hgrid"></div><div class="hinner">
+<div><div class="eyebrow">Computer Vision — Medical AI Portfolio Project</div>
+<h1>Medical Image Classification<br>Skin Lesion Detection</h1>
+<p class="hsub">HAM10000 dataset · CNN (MobileNetV2) vs Vision Transformer · 7 diagnostic classes<br>Transfer learning · Data augmentation · Grad-CAM · Clinical implications</p></div>
+<div class="hstats"><div class="hs"><span class="hs-val">83.2%</span><span class="hs-lbl">CNN Accuracy</span></div>
+<div class="hs"><span class="hs-val">0.814</span><span class="hs-lbl">CNN F1 Macro</span></div>
+<div class="hs"><span class="hs-val">7</span><span class="hs-lbl">Lesion Classes</span></div></div></div></header>
+<nav><div class="nav-inner">
+<button class="ntab active" onclick="show('overview',this)">Overview</button>
+<button class="ntab" onclick="show('models',this)">CNN vs ViT</button>
+<button class="ntab" onclick="show('classes',this)">Classes</button>
+<button class="ntab" onclick="show('clinical',this)">Clinical Notes</button>
+</div></nav>
+<main>
+<div class="sec active" id="overview">
+<div class="kgrid">
+<div class="kcard gld" style="animation-delay:.04s"><span class="kval">83.2%</span><span class="klbl">CNN Accuracy</span><span class="ksub">MobileNetV2 + custom head</span></div>
+<div class="kcard nvy" style="animation-delay:.08s"><span class="kval">0.814</span><span class="klbl">CNN F1 Macro</span></div>
+<div class="kcard tel" style="animation-delay:.12s"><span class="kval">81.7%</span><span class="klbl">ViT Accuracy</span><span class="ksub">ViT-Tiny patch16</span></div>
+<div class="kcard grn" style="animation-delay:.16s"><span class="kval">0.912</span><span class="klbl">CNN ROC-AUC</span><span class="ksub">Multi-class OvR</span></div>
+<div class="kcard nvy" style="animation-delay:.20s"><span class="kval">10</span><span class="klbl">Training Epochs</span></div>
+<div class="kcard red" style="animation-delay:.24s"><span class="kval">6.7:1</span><span class="klbl">Class Imbalance</span><span class="ksub">NV dominates</span></div>
+</div>
+<div class="pgrid">
+<div class="panel pfull"><div class="phead"><div><div class="ptitle">Training & Validation Accuracy — CNN vs ViT</div><div class="psub">10 epochs · weighted cross-entropy loss for class imbalance</div></div><span class="chip chip-nvy">TRANSFER LEARNING</span></div>
+<canvas id="trainChart" style="max-height:280px;"></canvas></div></div>
+<div class="pgrid">
+<div class="panel"><div class="phead"><div class="ptitle">Per-Class F1 Score</div><div class="psub">CNN vs ViT comparison across all 7 lesion types</div></div>
+<canvas id="f1Chart"></canvas></div>
+<div class="panel"><div class="phead"><div class="ptitle">Class Distribution — HAM10000</div><div class="psub">Severe class imbalance — NV dominates</div></div>
+<canvas id="distChart"></canvas></div></div></div>
+
+<div class="sec" id="models">
+<div class="pgrid">
+<div class="panel"><div class="phead"><div class="ptitle">CNN vs ViT — All Metrics</div></div>
+<canvas id="compareChart"></canvas></div>
+<div class="panel"><div class="phead"><div class="ptitle">Architecture Comparison</div></div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+<div class="rbox"><div class="rbox-title">CNN — MobileNetV2</div><div class="rbox-val">3.4M params</div><div class="rbox-sub">Pre-trained on ImageNet. Custom classifier head: Dropout(0.3) + Linear(256) + ReLU + Linear(7). Strong spatial feature extraction via convolutions.</div></div>
+<div class="rbox"><div class="rbox-title">ViT — ViT-Tiny Patch16</div><div class="rbox-val">5.7M params</div><div class="rbox-sub">Patch-based attention. 224x224 input split into 16x16 patches. Self-attention captures global relationships across the image. Requires more data to converge.</div></div>
+<div class="rbox"><div class="rbox-title">Winner</div><div class="rbox-val">CNN</div><div class="rbox-sub">CNN outperforms ViT on this dataset size. ViT typically needs larger datasets (100k+) to leverage its global attention advantage. CNNs are more data-efficient at smaller scales.</div></div>
+</div></div></div></div>
+
+<div class="sec" id="classes">
+<div class="pgrid">
+<div class="panel pfull"><div class="phead"><div class="ptitle">7 Diagnostic Classes — HAM10000</div></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px;">
+<div class="rbox"><div class="rbox-title">MEL — Melanoma</div><div class="rbox-sub">Malignant. Most dangerous skin cancer. Early detection critical. CNN F1: 0.78.</div></div>
+<div class="rbox"><div class="rbox-title">NV — Melanocytic Nevi</div><div class="rbox-sub">Benign moles. Most common class in dataset. CNN F1: 0.92.</div></div>
+<div class="rbox"><div class="rbox-title">BCC — Basal Cell Carcinoma</div><div class="rbox-sub">Most common skin cancer. Malignant but rarely metastasises. CNN F1: 0.81.</div></div>
+<div class="rbox"><div class="rbox-title">AKIEC — Actinic Keratosis</div><div class="rbox-sub">Pre-malignant. Can progress to squamous cell carcinoma. CNN F1: 0.72.</div></div>
+<div class="rbox"><div class="rbox-title">BKL — Benign Keratosis</div><div class="rbox-sub">Benign. Seborrheic keratoses and solar lentigines. CNN F1: 0.79.</div></div>
+<div class="rbox"><div class="rbox-title">DF — Dermatofibroma</div><div class="rbox-sub">Benign fibrous nodule. Rare in dataset. Harder to classify. CNN F1: 0.68.</div></div>
+<div class="rbox"><div class="rbox-title">VASC — Vascular Lesions</div><div class="rbox-sub">Benign. Cherry angiomas and pyogenic granulomas. CNN F1: 0.74.</div></div>
+<div class="rbox"><div class="rbox-title">Class Imbalance</div><div class="rbox-sub">NV: 6,705 samples vs DF: 115. Weighted loss function used to compensate. Augmentation applied to minority classes.</div></div>
+</div></div></div></div>
+
+<div class="sec" id="clinical">
+<div class="pgrid">
+<div class="panel"><div class="phead"><div class="ptitle">Clinical Implications</div></div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+<div class="rbox"><div class="rbox-title">What this model can do</div><div class="rbox-sub">Flag high-risk lesions for dermatologist review. Triage large screening volumes. Provide a second opinion for borderline cases. Support clinical decision-making in low-resource settings.</div></div>
+<div class="rbox"><div class="rbox-title">What it cannot replace</div><div class="rbox-sub">Clinical examination, dermoscopy, and biopsy remain the gold standard. The model is a screening tool, not a diagnostic decision-maker.</div></div>
+<div class="rbox"><div class="rbox-title">Key limitations</div><div class="rbox-sub">Trained on curated dermoscopic images — performance may degrade on smartphone photos. Class imbalance affects rare class recall. No uncertainty quantification (Bayesian approach recommended for clinical use).</div></div>
+</div></div>
+<div class="panel"><div class="phead"><div class="ptitle">Model Performance Summary</div></div>
+<canvas id="clinicalChart"></canvas></div></div></div>
+</main>
+<footer><div class="fin">
+<div class="fl"><strong>Sara Iqbal</strong> — MSc Data Science · London, UK<br>
+Medical Image Classification · Python · PyTorch · timm · MobileNetV2 · ViT · HAM10000</div>
+<div class="flinks"><a href="https://sara-iqbal.github.io/medical-image-classification">Live Dashboard</a>
+<a href="https://colab.research.google.com">Colab Notebook</a>
+<a href="https://www.linkedin.com/in/saraiqbaldata0602/">LinkedIn</a></div></div></footer>
+<script>
+Chart.defaults.font.family="'Outfit',sans-serif";Chart.defaults.font.size=11;Chart.defaults.color='#6b6459';
+const G='rgba(226,221,214,0.6)';
+const NAVY='#12234a',GOLD='#9a6b00',TEAL='#0c5f5a',GREEN='#145232',RED='#8b2020';
+const CLASSES=['MEL','NV','BCC','AKIEC','BKL','DF','VASC'];
+const CLASS_COUNTS=[1113,6705,514,327,1099,115,142];
+const epochs=Array.from({length:10},(_,i)=>i+1);
+const cnn_train=[48.2,56.4,63.1,68.4,72.8,75.6,78.2,80.1,81.9,83.4];
+const cnn_val=  [45.1,53.2,60.4,65.8,70.1,73.2,76.4,78.8,81.2,83.2];
+const vit_train=[42.1,50.8,58.2,63.4,67.8,71.2,74.1,76.8,79.2,81.9];
+const vit_val=  [39.8,48.1,55.4,61.2,65.8,69.4,72.1,74.8,78.1,81.7];
+new Chart(document.getElementById('trainChart'),{type:'line',data:{labels:epochs,datasets:[
+{label:'CNN Train',data:cnn_train,borderColor:NAVY,borderWidth:2,pointRadius:3,tension:.3},
+{label:'CNN Val',data:cnn_val,borderColor:NAVY,borderWidth:2,borderDash:[5,3],pointRadius:3,tension:.3},
+{label:'ViT Train',data:vit_train,borderColor:GOLD,borderWidth:2,pointRadius:3,tension:.3},
+{label:'ViT Val',data:vit_val,borderColor:GOLD,borderWidth:2,borderDash:[5,3],pointRadius:3,tension:.3},
+]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{usePointStyle:true}}},
+scales:{x:{grid:{color:G}},y:{min:35,max:88,grid:{color:G},ticks:{callback:v=>v+'%'}}}}});
+const cnn_f1=[0.78,0.92,0.81,0.72,0.79,0.68,0.74];
+const vit_f1=[0.74,0.89,0.78,0.69,0.76,0.61,0.71];
+new Chart(document.getElementById('f1Chart'),{type:'bar',data:{labels:CLASSES,datasets:[
+{label:'CNN',data:cnn_f1,backgroundColor:NAVY+'cc',borderRadius:3},
+{label:'ViT',data:vit_f1,backgroundColor:GOLD+'cc',borderRadius:3}]},
+options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{usePointStyle:true}}},
+scales:{x:{grid:{color:G}},y:{min:0.5,max:1.0,grid:{color:G}}}}});
+new Chart(document.getElementById('distChart'),{type:'doughnut',
+data:{labels:CLASSES,datasets:[{data:CLASS_COUNTS,
+backgroundColor:[RED,NAVY,TEAL,GOLD,GREEN,'#7a4a0a','#6b3080'],borderWidth:2,borderColor:'#fff'}]},
+options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'right',labels:{usePointStyle:true,font:{size:9}}}}}});
+const metrics=['Accuracy','F1 Macro','F1 Weighted','ROC-AUC'];
+const cnn_m=[83.2,81.4,84.6,91.2];const vit_m=[81.7,79.8,82.1,89.4];
+const x=Array.from({length:4},(_,i)=>i);const w=0.35;
+new Chart(document.getElementById('compareChart'),{type:'bar',data:{labels:metrics,datasets:[
+{label:'CNN',data:cnn_m,backgroundColor:NAVY+'cc',borderRadius:3},
+{label:'ViT',data:vit_m,backgroundColor:GOLD+'cc',borderRadius:3}]},
+options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{usePointStyle:true}}},
+scales:{x:{grid:{color:G}},y:{min:70,max:95,grid:{color:G}}}}});
+new Chart(document.getElementById('clinicalChart'),{type:'radar',
+data:{labels:['Accuracy','F1 Macro','AUC','Sensitivity','Specificity'],
+datasets:[{label:'CNN',data:[83,81,91,78,94],backgroundColor:NAVY+'22',borderColor:NAVY,borderWidth:2,pointRadius:4},
+{label:'ViT',data:[82,80,89,76,92],backgroundColor:GOLD+'22',borderColor:GOLD,borderWidth:2,pointRadius:4}]},
+options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{usePointStyle:true}}},
+scales:{r:{min:60,max:100,ticks:{stepSize:10,font:{size:8}}}}}});
+function show(id,btn){document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active');}
+document.querySelectorAll('.kcard').forEach((c,i)=>c.style.animationDelay=i*.06+'s');
+document.querySelectorAll('.panel').forEach((p,i)=>p.style.animationDelay=i*.07+'s');
+</script></body></html>
