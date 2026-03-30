@@ -6,8 +6,8 @@
 
 This project builds and compares two distinct deep learning architectures—a Convolutional Neural Network (MobileNetV2) and a Vision Transformer (ViT-Tiny)—for classifying skin lesion images into 7 diagnostic categories. The objective is to evaluate how traditional local feature extraction compares to global attention-based models in a clinical decision support context.
 
-**[Link to Live Dashboard]([https://www.google.com/search?q=%23](https://sara-iqbal.github.io/Medical-Image-Classification-Skin-Lesion-Detection/))** | **[Link to Source Code]([https://www.google.com/search?q=%](https://drive.google.com/file/d/1HzdWPQL2c2Ex5dE1wyiWzf_USDEV-60v/view?usp=sharing)23)**
-*(Update these links with your actual URLs)*
+**[Link to Live Dashboard] ([https://www.google.com/search?q=%23](https://sara-iqbal.github.io/Medical-Image-Classification-Skin-Lesion-Detection/))** | **[Link to Source Code] ([https://www.google.com/search?q=%](https://drive.google.com/file/d/1HzdWPQL2c2Ex5dE1wyiWzf_USDEV-60v/view?usp=sharing)23)**
+
 
 ## The Dataset
 
